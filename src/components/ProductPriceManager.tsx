@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Tag,
@@ -40,15 +40,27 @@ export default function ProductPriceManager() {
 
   // Add Product Modal State
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+
+  // Prevent background page from scrolling when any modal is open
+  useEffect(() => {
+    if (selectedProductForModal || isAddModalOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [selectedProductForModal, isAddModalOpen]);
   const [newProduct, setNewProduct] = useState({
     sku: '',
     name: '',
     banglaName: '',
-    category: 'Cream Biscuits',
-    cartonSize: 48,
-    dealerPrice: 8.5,
-    tradePrice: 9.2,
-    mrp: 10,
+    category: 'Carbonated Beverages',
+    cartonSize: 24,
+    dealerPrice: 16.5,
+    tradePrice: 18.0,
+    mrp: 20,
     initialStockPcs: 0,
     minStockAlert: 96,
   });
@@ -449,50 +461,58 @@ export default function ProductPriceManager() {
 
       {/* Single Product Price Update Modal */}
       {selectedProductForModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-          <div className="bg-white border border-slate-200 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl text-slate-900">
-            <div className="p-5 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-3 sm:p-4 overflow-y-auto"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setSelectedProductForModal(null);
+          }}
+        >
+          <div className="bg-white border border-slate-200 rounded-2xl w-full max-w-lg shadow-2xl text-slate-900 my-auto flex flex-col max-h-[calc(100vh-2rem)] sm:max-h-[88vh] overflow-hidden">
+            {/* Header (fixed at top of modal) */}
+            <div className="p-4 sm:p-5 border-b border-slate-200 bg-slate-50 flex items-center justify-between shrink-0">
               <div>
-                <span className="text-[10px] font-mono text-amber-400 uppercase font-bold">
+                <span className="text-[10px] font-mono text-amber-500 uppercase font-bold">
                   {selectedProductForModal.sku}
                 </span>
-                <h3 className="text-lg font-black text-slate-900">
+                <h3 className="text-base sm:text-lg font-black text-slate-900">
                   {selectedProductForModal.name}
                 </h3>
                 {selectedProductForModal.banglaName && (
-                  <p className="text-xs text-slate-400">{selectedProductForModal.banglaName}</p>
+                  <p className="text-xs text-slate-500 font-medium">{selectedProductForModal.banglaName}</p>
                 )}
               </div>
               <button
                 onClick={() => setSelectedProductForModal(null)}
-                className="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg"
+                className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-200 rounded-lg transition"
+                title="বন্ধ করুন"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="p-6 space-y-4">
-              <div className="bg-slate-900 border border-slate-700 rounded-xl p-3 text-xs text-black">
-                <div className="font-bold flex items-center gap-1.5 mb-1">
-                  <AlertCircle className="w-4 h-4 text-amber-400" />
+            {/* Scrollable Body */}
+            <div className="p-4 sm:p-6 space-y-4 overflow-y-auto flex-1 overscroll-contain">
+              <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-900">
+                <div className="font-bold flex items-center gap-1.5 mb-1 text-amber-800">
+                  <AlertCircle className="w-4 h-4 text-amber-600" />
                   রেট পরিবর্তনের নিয়ম:
                 </div>
                 নতুন বিক্রয় রেট কেবল আজকের পরের নতুন সেল মেমোতে কার্যকর হবে। পূর্ববর্তী তারিখের
                 বিক্রয়সমূহ তাদের মূল রেটেই সংরক্ষিত থাকবে।
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3 sm:gap-4">
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1">
                     বর্তমান বিক্রয় রেট (Current TP)
                   </label>
-                  <div className="text-sm font-bold text-slate-400 font-mono bg-slate-950 px-3 py-2 rounded-xl border border-slate-800">
+                  <div className="text-sm font-bold text-slate-700 font-mono bg-slate-100 px-3 py-2 rounded-xl border border-slate-200">
                     ৳{selectedProductForModal.tradePrice.toFixed(2)}
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-amber-400 mb-1">
+                  <label className="block text-xs font-bold text-orange-600 mb-1">
                     নতুন বিক্রয় রেট (New TP) *
                   </label>
                   <input
@@ -501,12 +521,12 @@ export default function ProductPriceManager() {
                     min="0"
                     value={modalTradePrice}
                     onChange={(e) => setModalTradePrice(parseFloat(e.target.value) || 0)}
-                    className="w-full bg-slate-950 border border-amber-500/80 rounded-xl px-3 py-2 text-sm text-amber-300 font-bold font-mono focus:outline-none focus:ring-1 focus:ring-amber-400"
+                    className="w-full bg-white border-2 border-orange-400 rounded-xl px-3 py-2 text-sm text-slate-900 font-bold font-mono focus:outline-none focus:ring-2 focus:ring-orange-400"
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3 sm:gap-4">
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1">
                     নতুন ক্রয় রেট (New IP)
@@ -544,7 +564,7 @@ export default function ProductPriceManager() {
                   type="text"
                   value={modalNote}
                   onChange={(e) => setModalNote(e.target.value)}
-                  placeholder="e.g. আকিজ কোম্পানি নির্ধারিত নতুন মূল্য তালিকা"
+                  placeholder="যেমন: ফ্রেশ কোম্পানি নির্ধারিত নতুন মূল্য তালিকা"
                   className="w-full bg-white border-2 border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 shadow-sm focus:outline-none focus:border-amber-400"
                 />
               </div>
@@ -552,24 +572,24 @@ export default function ProductPriceManager() {
               {/* Price History */}
               {selectedProductForModal.priceHistory &&
                 selectedProductForModal.priceHistory.length > 0 && (
-                  <div className="mt-4 pt-4 border-t border-slate-800">
-                    <div className="text-xs font-bold text-slate-400 flex items-center gap-1.5 mb-2">
-                      <History className="w-3.5 h-3.5 text-amber-400" />
+                  <div className="mt-4 pt-4 border-t border-slate-200">
+                    <div className="text-xs font-bold text-slate-600 flex items-center gap-1.5 mb-2">
+                      <History className="w-3.5 h-3.5 text-amber-500" />
                       রেট পরিবর্তনের অতীত ইতিহাস (History Log):
                     </div>
-                    <div className="space-y-1.5 max-h-28 overflow-y-auto pr-1 text-[11px] font-mono">
+                    <div className="space-y-1.5 max-h-36 overflow-y-auto pr-1 text-[11px] font-mono">
                       {selectedProductForModal.priceHistory.map((h, i) => (
                         <div
                           key={i}
                           className="bg-slate-50 border border-slate-200 p-2 rounded-lg flex items-center justify-between text-slate-700"
                         >
                           <div>
-                            <span className="text-emerald-400 font-bold">TP: ৳{h.tradePrice}</span>
-                            <span className="mx-2 text-slate-600">|</span>
+                            <span className="text-emerald-600 font-bold">TP: ৳{h.tradePrice}</span>
+                            <span className="mx-2 text-slate-300">|</span>
                             <span>IP: ৳{h.dealerPrice}</span>
                             {h.note && <span className="ml-2 text-slate-500 font-sans">({h.note})</span>}
                           </div>
-                          <span className="text-slate-600 text-[10px]">
+                          <span className="text-slate-400 text-[10px]">
                             {new Date(h.effectiveFrom).toLocaleDateString()}
                           </span>
                         </div>
@@ -579,17 +599,18 @@ export default function ProductPriceManager() {
                 )}
             </div>
 
-            <div className="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-end gap-3">
+            {/* Footer (fixed at bottom of modal) */}
+            <div className="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-end gap-3 shrink-0">
               <button
                 onClick={() => setSelectedProductForModal(null)}
-                className="px-4 py-2 text-xs font-semibold text-slate-400 hover:text-slate-700"
+                className="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900 transition"
               >
                 বাতিল করুন
               </button>
               <button
                 onClick={() => priceUpdateMutation.mutate()}
                 disabled={priceUpdateMutation.isPending}
-                className="px-5 py-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black rounded-xl text-xs shadow-lg shadow-orange-500/20 transition disabled:opacity-50"
+                className="px-5 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black rounded-xl text-xs shadow-lg shadow-orange-500/20 transition disabled:opacity-50"
               >
                 {priceUpdateMutation.isPending ? 'আপডেট হচ্ছে...' : 'নতুন রেট কার্যকর করুন'}
               </button>
@@ -600,20 +621,28 @@ export default function ProductPriceManager() {
 
       {/* Add New Product Modal */}
       {isAddModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-          <div className="bg-white border border-slate-200 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl text-slate-900">
-            <div className="p-5 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
-              <h3 className="text-lg font-black text-slate-900">নতুন বিস্কুট আইটেম যোগ করুন</h3>
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-3 sm:p-4 overflow-y-auto"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setIsAddModalOpen(false);
+          }}
+        >
+          <div className="bg-white border border-slate-200 rounded-2xl w-full max-w-lg shadow-2xl text-slate-900 my-auto flex flex-col max-h-[calc(100vh-2rem)] sm:max-h-[88vh] overflow-hidden">
+            {/* Header (fixed at top of modal) */}
+            <div className="p-4 sm:p-5 border-b border-slate-200 bg-slate-50 flex items-center justify-between shrink-0">
+              <h3 className="text-base sm:text-lg font-black text-slate-900">নতুন পণ্য যোগ করুন</h3>
               <button
                 onClick={() => setIsAddModalOpen(false)}
-                className="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg"
+                className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-200 rounded-lg transition"
+                title="বন্ধ করুন"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="p-6 space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+            {/* Scrollable Body */}
+            <div className="p-4 sm:p-6 space-y-4 overflow-y-auto flex-1 overscroll-contain">
+              <div className="grid grid-cols-2 gap-3 sm:gap-4">
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1">
                     SKU কোড *
@@ -622,7 +651,7 @@ export default function ProductPriceManager() {
                     type="text"
                     value={newProduct.sku}
                     onChange={(e) => setNewProduct({ ...newProduct, sku: e.target.value })}
-                    placeholder="FAN-060"
+                    placeholder="FR-021"
                     className="w-full bg-white border-2 border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 shadow-sm focus:outline-none focus:border-amber-400"
                   />
                 </div>
@@ -635,25 +664,22 @@ export default function ProductPriceManager() {
                     onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value })}
                     className="w-full bg-white border-2 border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 shadow-sm focus:outline-none focus:border-amber-400"
                   >
-                    <option value="Cream Biscuits">Cream Biscuits</option>
-                    <option value="Cookies">Cookies</option>
-                    <option value="Crackers & Salty">Crackers & Salty</option>
-                    <option value="Marie & Glucose">Marie & Glucose</option>
-                    <option value="Toast & Dry Cake">Toast & Dry Cake</option>
-                    <option value="Wafers & Rolls">Wafers & Rolls</option>
+                    <option value="Carbonated Beverages">Carbonated Beverages</option>
+                    <option value="Drinking Water">Drinking Water</option>
+                    <option value="Energy Drinks">Energy Drinks</option>
                   </select>
                 </div>
               </div>
 
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  বিস্কুটের নাম (English) *
+                  পণ্যের নাম (English) *
                 </label>
                 <input
                   type="text"
                   value={newProduct.name}
                   onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
-                  placeholder="Fantastic Premium Cookies 100g"
+                  placeholder="Fresh Cola 250 ml"
                   className="w-full bg-white border-2 border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 shadow-sm focus:outline-none focus:border-amber-400"
                 />
               </div>
@@ -666,7 +692,7 @@ export default function ProductPriceManager() {
                   type="text"
                   value={newProduct.banglaName}
                   onChange={(e) => setNewProduct({ ...newProduct, banglaName: e.target.value })}
-                  placeholder="ফ্যান্টাস্টিক প্রিমিয়াম কুকিজ ১০০ গ্রাম"
+                  placeholder="ফ্রেশ খাবার পানীয়"
                   className="w-full bg-white border-2 border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 shadow-sm focus:outline-none focus:border-amber-400"
                 />
               </div>
@@ -700,7 +726,7 @@ export default function ProductPriceManager() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-amber-400 mb-1">
+                  <label className="block text-xs font-bold text-orange-600 mb-1">
                     বিক্রয় রেট (TP)
                   </label>
                   <input
@@ -710,23 +736,24 @@ export default function ProductPriceManager() {
                     onChange={(e) =>
                       setNewProduct({ ...newProduct, tradePrice: parseFloat(e.target.value) || 0 })
                     }
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-amber-300 font-mono font-bold focus:outline-none focus:border-amber-400"
+                    className="w-full bg-white border-2 border-orange-400 rounded-xl px-3 py-2 text-xs text-slate-900 font-mono font-bold focus:outline-none focus:border-orange-500"
                   />
                 </div>
               </div>
             </div>
 
-            <div className="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-end gap-3">
+            {/* Footer (fixed at bottom of modal) */}
+            <div className="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-end gap-3 shrink-0">
               <button
                 onClick={() => setIsAddModalOpen(false)}
-                className="px-4 py-2 text-xs font-semibold text-slate-400 hover:text-slate-700"
+                className="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900 transition"
               >
                 বাতিল
               </button>
               <button
                 onClick={() => createProductMutation.mutate()}
                 disabled={createProductMutation.isPending || !newProduct.sku || !newProduct.name}
-                className="px-5 py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-black rounded-xl text-xs transition disabled:opacity-50"
+                className="px-5 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black rounded-xl text-xs transition disabled:opacity-50"
               >
                 {createProductMutation.isPending ? 'যোগ হচ্ছে...' : 'সংরক্ষণ করুন'}
               </button>
