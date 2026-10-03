@@ -1,0 +1,30 @@
+import type { MetadataRoute } from 'next';
+
+export default function manifest(): MetadataRoute.Manifest {
+  return {
+    name: 'Tanvir Traders — Akij Bakers Dealership',
+    short_name: 'Tanvir Traders',
+    description: 'তানভীর ট্রেডার্স — আকিজ বেকার্স (ফ্যান্টাস্টিক) অনুমোদিত পরিবেশক ও বিক্রয় ব্যবস্থাপনা প্ল্যাটফর্ম',
+    start_url: '/',
+    display: 'standalone',
+    background_color: '#ffffff',
+    theme_color: '#f97316',
+    icons: [
+      {
+        src: '/icon-192.png',
+        sizes: '192x192',
+        type: 'image/png',
+      },
+      {
+        src: '/icon-512.png',
+        sizes: '512x512',
+        type: 'image/png',
+      },
+      {
+        src: '/icon.svg',
+        sizes: 'any',
+        type: 'image/svg+xml',
+      },
+    ],
+  };
+}

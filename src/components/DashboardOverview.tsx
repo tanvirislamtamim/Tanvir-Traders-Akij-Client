@@ -61,7 +61,7 @@ export default function DashboardOverview({ setActiveTab }: Props) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <PackageCheck size={28} color="#fff" />
           <div>
-            <div style={{ fontSize: 18, fontWeight: 900 }}>TANVIR TRADERS</div>
+            <h1 style={{ fontSize: 18, fontWeight: 900, margin: 0, lineHeight: 1.2 }}>TANVIR TRADERS</h1>
             <div style={{ fontSize: 11, opacity: 0.85 }}>Akij Bakers Limited — Fantastic </div>
           </div>
         </div>
