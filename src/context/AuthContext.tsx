@@ -30,7 +30,7 @@ interface AuthContextType {
   loading: boolean;
   isDeveloper: boolean;
   isDealer: boolean;        // true for dealer AND developer
-  isAdmin: boolean;         // true for both admin AND developer
+  isAdmin: boolean;         // true for dealer, admin AND developer
   isUser: boolean;
   login: (email: string, password: string) => Promise<void>;
   loginWithGoogle: () => Promise<void>;
@@ -127,7 +127,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const isDeveloper = user?.role === 'developer';
   const isDealer = user?.role === 'dealer' || user?.role === 'developer';
-  const isAdmin = user?.role === 'admin' || user?.role === 'developer';
+  const isAdmin = user?.role === 'admin' || user?.role === 'dealer' || user?.role === 'developer';
   const isUser = !!user;
 
   // Sync Firebase UID to axios headers so backend can identify the caller

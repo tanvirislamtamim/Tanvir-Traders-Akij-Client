@@ -125,7 +125,7 @@ export default function UserManagement() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 8, marginTop: 12 }}>
           {[
             { role: 'developer' as UserRole, desc: 'সব কিছু + User Management' },
-            { role: 'dealer' as UserRole, desc: 'পেন্ডিং অনুমোদন/বাতিল (ডিলার)' },
+            { role: 'dealer' as UserRole, desc: 'Users পেজ বাদে সব কিছু (সেল, চালান, রেট, রিপোর্ট, অনুমোদন)' },
             { role: 'admin' as UserRole, desc: 'স্টক, রেট, রিপোর্ট + বিক্রয় (অনুমোদন সাপেক্ষে)' },
             { role: 'user' as UserRole, desc: 'শুধুমাত্র Dashboard দেখতে পারবে' },
           ].map(({ role, desc }) => {

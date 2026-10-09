@@ -38,7 +38,7 @@ interface ItemEntryState {
 
 export default function DailySalesEntry() {
   const queryClient = useQueryClient();
-  const { isAdmin, isDeveloper } = useAuth();
+  const { user, isAdmin, isDeveloper } = useAuth();
   const todayStr = new Date().toISOString().slice(0, 10);
   const [selectedDate, setSelectedDate] = useState(todayStr);
   const [searchQuery, setSearchQuery] = useState('');
@@ -361,7 +361,7 @@ export default function DailySalesEntry() {
       </div>
 
       {/* Role-based info banner */}
-      {isAdmin && !isDeveloper && (
+      {user?.role === 'admin' && (
         <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 flex items-start gap-3">
           <span className="text-2xl flex-shrink-0">⏳</span>
           <div>
@@ -727,10 +727,10 @@ export default function DailySalesEntry() {
               <Save className="w-4 h-4" />
               <span>
                 {saveMutation.isPending
-                  ? (isAdmin && !isDeveloper ? 'পেন্ডিং-এ পাঠানো হচ্ছে...' : 'সন্রক্ষণ ও স্টক কর্তন হচ্ছে...')
+                  ? (user?.role === 'admin' ? 'পেন্ডিং-এ পাঠানো হচ্ছে...' : 'সংরক্ষণ ও স্টক কর্তন হচ্ছে...')
                   : hasStockViolation
                     ? 'পর্যাপ্ত স্টক নেই (সংশোধন করুন)'
-                    : isAdmin && !isDeveloper
+                    : user?.role === 'admin'
                       ? (isExistingRecord ? '⏳ পেন্ডিং-এ পাঠান (আপডেট)' : '⏳ পেন্ডিং-এ পাঠান')
                       : isExistingRecord
                         ? 'আপডেট ও স্টক সমন্বয় করুন'

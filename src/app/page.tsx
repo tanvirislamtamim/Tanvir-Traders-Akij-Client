@@ -98,12 +98,12 @@ export default function Home() {
 
       <main style={{ flex: 1, maxWidth: 1200, width: '100%', margin: '0 auto', padding: '20px 16px 40px' }}>
         {activeTab === 'dashboard'       && <DashboardOverview setActiveTab={setActiveTab} />}
-        {activeTab === 'daily-sales'     && (isAdmin     ? <DailySalesEntry />       : <AccessDenied />)}
-        {activeTab === 'stock-inward'    && (isAdmin     ? <StockInwardEntry />      : <AccessDenied />)}
-        {activeTab === 'product-pricing' && (isAdmin     ? <ProductPriceManager />  : <AccessDenied />)}
-        {activeTab === 'monthly-report'  && (isAdmin     ? <MonthlyReportView />    : <AccessDenied />)}
-        {activeTab === 'pending'         && ((isDealer || isAdmin) ? <PendingApproval /> : <AccessDenied />)}
-        {activeTab === 'user-management' && (isDeveloper ? <UserManagement />       : <AccessDenied />)}
+        {activeTab === 'daily-sales'     && ((isAdmin || isDealer) ? <DailySalesEntry />       : <AccessDenied />)}
+        {activeTab === 'stock-inward'    && ((isAdmin || isDealer) ? <StockInwardEntry />      : <AccessDenied />)}
+        {activeTab === 'product-pricing' && ((isAdmin || isDealer) ? <ProductPriceManager />  : <AccessDenied />)}
+        {activeTab === 'monthly-report'  && ((isAdmin || isDealer) ? <MonthlyReportView />    : <AccessDenied />)}
+        {activeTab === 'pending'         && ((isAdmin || isDealer) ? <PendingApproval />       : <AccessDenied />)}
+        {activeTab === 'user-management' && (isDeveloper           ? <UserManagement />       : <AccessDenied />)}
       </main>
 
       <footer style={{
